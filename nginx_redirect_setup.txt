@@ -2,7 +2,7 @@ NGINX REDIRECT SETUP GUIDE
 ==========================
 From: webmail-auth001.ibeddcoutsource.org
 To: webmail-auth001.molecullesoft.com
-Encryption Path: /cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=
+Encryption Path: /cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=3
 
 STEP 1: INSTALL NGINX (if not already installed)
 ================================================
