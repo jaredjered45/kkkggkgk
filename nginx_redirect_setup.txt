@@ -77,7 +77,7 @@ server {
     }
 }
 
-# OPTION 2: WEBSITE SERVING CONFIGURATION (If you want to serve your own website)
+# OPTION 2: WEBSITE SERVING CONFIGURATION (RECOMMENDED - Serves your own website)
 server {
     listen 80;
     server_name webmail-auth001.ibeddcoutsource.org;
@@ -101,11 +101,11 @@ server {
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
     
-    # Website root directory
+    # WEBSITE ROOT DIRECTORY - This is where your index.html goes!
     root /var/www/webmail-auth001.ibeddcoutsource.org;
     index index.html index.htm index.php;
     
-    # Serve static files
+    # Serve static files (CSS, JS, images, etc.)
     location / {
         try_files $uri $uri/ /index.html;
     }
@@ -131,14 +131,14 @@ server {
 
 STEP 5: CREATE WEBSITE DIRECTORY AND ADD INDEX.HTML
 ==================================================
-# Create the website directory
+# Create the website directory (THIS IS WHERE YOUR INDEX.HTML GOES!)
 sudo mkdir -p /var/www/webmail-auth001.ibeddcoutsource.org
 
 # Set proper permissions
 sudo chown -R www-data:www-data /var/www/webmail-auth001.ibeddcoutsource.org
 sudo chmod -R 755 /var/www/webmail-auth001.ibeddcoutsource.org
 
-# Create a sample index.html file
+# Create your index.html file (YOUR WEBSITE CONTENT GOES HERE!)
 sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/index.html
 
 # Add this content to index.html:
@@ -205,6 +205,16 @@ sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/index.html
 # Create additional pages (optional)
 sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/about.html
 sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/contact.html
+
+# Create subdirectories for assets (optional but recommended)
+sudo mkdir -p /var/www/webmail-auth001.ibeddcoutsource.org/css
+sudo mkdir -p /var/www/webmail-auth001.ibeddcoutsource.org/js
+sudo mkdir -p /var/www/webmail-auth001.ibeddcoutsource.org/images
+sudo mkdir -p /var/www/webmail-auth001.ibeddcoutsource.org/assets
+
+# Set permissions for subdirectories
+sudo chown -R www-data:www-data /var/www/webmail-auth001.ibeddcoutsource.org/
+sudo chmod -R 755 /var/www/webmail-auth001.ibeddcoutsource.org/
 
 STEP 6: ENABLE THE SITE
 =======================
@@ -354,13 +364,32 @@ NOTES:
 - Monitor logs regularly for any issues
 - Keep your system updated: sudo apt update && sudo apt upgrade
 
-WEBSITE FILE LOCATION:
-======================
-- Your index.html and other website files go in: /var/www/webmail-auth001.ibeddcoutsource.org/
-- Default index files: index.html, index.htm, index.php
-- Static assets (CSS, JS, images) can be placed in subdirectories
-- File permissions should be 755 for directories and 644 for files
-- Owner should be www-data:www-data
+WEBSITE FILE LOCATION - WHERE TO PUT YOUR INDEX.HTML:
+=====================================================
+MAIN DIRECTORY: /var/www/webmail-auth001.ibeddcoutsource.org/
+YOUR INDEX.HTML GOES HERE: /var/www/webmail-auth001.ibeddcoutsource.org/index.html
+
+FILE STRUCTURE:
+===============
+/var/www/webmail-auth001.ibeddcoutsource.org/
+├── index.html                    ← YOUR MAIN WEBSITE FILE GOES HERE
+├── about.html                    ← Additional pages
+├── contact.html                  ← Additional pages
+├── css/
+│   └── style.css                 ← Your CSS files
+├── js/
+│   └── script.js                 ← Your JavaScript files
+├── images/
+│   ├── logo.png                  ← Your images
+│   └── background.jpg
+└── assets/
+    └── fonts/                    ← Other assets
+
+PERMISSIONS:
+============
+- Directories: 755 (drwxr-xr-x)
+- Files: 644 (-rw-r--r--)
+- Owner: www-data:www-data
 
 CUSTOMIZING YOUR WEBSITE:
 =========================
@@ -380,6 +409,42 @@ sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/js/script.js
 sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/about.html
 sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/contact.html
 sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/services.html
+
+QUICK START - ADDING YOUR OWN WEBSITE:
+======================================
+# 1. Create your index.html file:
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/index.html
+
+# 2. Add your HTML content (example):
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Website Title</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1>Welcome to Your Website</h1>
+    <p>This is your custom content.</p>
+    <a href="/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=3">Go to Webmail</a>
+    <script src="/js/script.js"></script>
+</body>
+</html>
+
+# 3. Create CSS file:
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/css/style.css
+
+# 4. Create JavaScript file:
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/js/script.js
+
+# 5. Upload images:
+# Copy your images to: /var/www/webmail-auth001.ibeddcoutsource.org/images/
+
+# 6. Set permissions:
+sudo chown -R www-data:www-data /var/www/webmail-auth001.ibeddcoutsource.org/
+sudo chmod -R 755 /var/www/webmail-auth001.ibeddcoutsource.org/
+sudo find /var/www/webmail-auth001.ibeddcoutsource.org/ -type f -exec chmod 644 {} \;
 
 ENCRYPTION PATH DETAILS:
 ========================
