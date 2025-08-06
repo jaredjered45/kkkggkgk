@@ -6,6 +6,9 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Copy the server configuration
 COPY webmail-auth001.ibeddcoutsource.org.conf /etc/nginx/conf.d/
 
+# Copy website files
+COPY website/ /var/www/html/
+
 # Create log directories
 RUN mkdir -p /var/log/nginx
 

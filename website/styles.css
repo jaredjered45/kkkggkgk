@@ -1,0 +1,278 @@
+/* Additional Styles for Webmail Authentication Service */
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #764ba2;
+}
+
+/* Print styles */
+@media print {
+    .container {
+        box-shadow: none;
+        background: white;
+    }
+    
+    .btn, .loading {
+        display: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .container {
+        border: 2px solid #000;
+    }
+    
+    .feature {
+        border: 2px solid #000;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .logo, .status-indicator, .spinner {
+        animation: none;
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    }
+    
+    .container {
+        background: rgba(44, 62, 80, 0.95);
+        color: #ecf0f1;
+    }
+    
+    .feature {
+        background: #34495e;
+        color: #ecf0f1;
+    }
+    
+    .domain-info {
+        background: #2c3e50;
+        color: #ecf0f1;
+    }
+}
+
+/* Focus styles for accessibility */
+.btn:focus,
+a:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Loading animation for better UX */
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive improvements */
+@media (max-width: 480px) {
+    .container {
+        padding: 1.5rem;
+        margin: 0.5rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .btn {
+        display: block;
+        margin: 0.5rem 0;
+        text-align: center;
+    }
+}
+
+/* Status indicator variations */
+.status-indicator.warning {
+    background: #f39c12;
+}
+
+.status-indicator.error {
+    background: #e74c3c;
+}
+
+.status-indicator.maintenance {
+    background: #9b59b6;
+}
+
+/* Feature card hover effects */
+.feature:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Security badge variations */
+.security-badge.warning {
+    background: #f39c12;
+}
+
+.security-badge.error {
+    background: #e74c3c;
+}
+
+.security-badge.info {
+    background: #3498db;
+}
+
+/* Domain info styling */
+.domain-info strong {
+    color: #2c3e50;
+}
+
+.domain-info code {
+    background: #ecf0f1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+}
+
+/* Footer styling */
+.footer a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* Logo variations */
+.logo.success {
+    color: #00b894;
+}
+
+.logo.warning {
+    color: #f39c12;
+}
+
+.logo.error {
+    color: #e74c3c;
+}
+
+/* Container variations */
+.container.glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.container.dark {
+    background: rgba(44, 62, 80, 0.95);
+    color: #ecf0f1;
+}
+
+/* Button variations */
+.btn.outline {
+    background: transparent;
+    border: 2px solid #667eea;
+    color: #667eea;
+}
+
+.btn.outline:hover {
+    background: #667eea;
+    color: white;
+}
+
+.btn.small {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+}
+
+.btn.large {
+    padding: 16px 40px;
+    font-size: 1.1rem;
+}
+
+/* Status card variations */
+.status-card.success {
+    background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+}
+
+.status-card.warning {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+}
+
+.status-card.error {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+/* Animation utilities */
+.slide-in-left {
+    animation: slideInLeft 0.6s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.6s ease-out;
+}
+
+.slide-in-up {
+    animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

