@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  nginx-redirect:
+    build: .
+    container_name: webmail-auth-redirect
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Mount SSL certificates (uncomment and adjust paths as needed)
+      # - ./ssl/certificate.crt:/etc/nginx/ssl/certificate.crt:ro
+      # - ./ssl/private.key:/etc/nginx/ssl/private.key:ro
+      - ./logs:/var/log/nginx
+    restart: unless-stopped
+    networks:
+      - redirect-network
+
+networks:
+  redirect-network:
+    driver: bridge
